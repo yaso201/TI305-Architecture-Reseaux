@@ -342,14 +342,15 @@ Câbles contenant plusieurs paires de fils de cuivre torsadés ensemble pour ré
 - **FTP (Foiled Twisted Pair)** : écran global
 
 **Catégories Ethernet :**
-| Catégorie | Bande passante | Vitesse max | Usage           |
-|-----------|----------------|-------------|-----------------|
-| Cat 5     | 100 MHz        | 100 Mbps    | Obsolète        |
-| Cat 5e    | 100 MHz        | 1 Gbps      | Minimum actuel  |
-| Cat 6     | 250 MHz        | 1-10 Gbps   | Standard actuel |
-| Cat 6a    | 500 MHz        | 10 Gbps     | Professionnel   |
-| Cat 7     | 600 MHz        | 10 Gbps     | Datacenter      |
-| Cat 8     | 2000 MHz       | 40 Gbps     | Datacenter      |
+
+| Catégorie     | Bande passante | Vitesse max | Usage           |
+|---------------|----------------|-------------|-----------------|
+| **Cat 5**     | 100 MHz        | 100 Mbps    | Obsolète        |
+| **Cat 5e**    | 100 MHz        | 1 Gbps      | Minimum actuel  |
+| **Cat 6**     | 250 MHz        | 1-10 Gbps   | Standard actuel |
+| **Cat 6a**    | 500 MHz        | 10 Gbps     | Professionnel   |
+| **Cat 7**     | 600 MHz        | 10 Gbps     | Datacenter      |
+| **Cat 8**     | 2000 MHz       | 40 Gbps     | Datacenter      |
 
 **Connecteurs :** RJ45 (8P8C)
 
