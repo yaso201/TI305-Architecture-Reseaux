@@ -4,6 +4,7 @@
 
 - [Syllabus](README.md)
 - [CM1 - Fondamentaux et Modèles Réseaux](CM/CM1-Fondamentaux.md)
+- [CM2 - Adressage IP et Subnetting](CM/CM2-IP&Subnetting.md)
 
 ---
 
