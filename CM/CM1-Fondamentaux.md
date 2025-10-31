@@ -188,7 +188,7 @@ Les réseaux se classifient principalement selon leur **échelle géographique**
 
 ---
 
-## 🔗 Topologies réseau {#topologies}
+## Topologies réseau {#topologies}
 
 La **topologie** désigne l'architecture physique ou logique d'organisation des équipements dans un réseau.
 
@@ -546,11 +546,15 @@ Le modèle **OSI (Open Systems Interconnection)** est un modèle de référence 
 - Carte réseau (adresse MAC)
 
 **Adresse MAC :**
-- 48 bits (6 octets)
-- Format : `AA:BB:CC:DD:EE:FF`
-- Unique au monde (théoriquement)
-- Première moitié = constructeur (OUI)
-- Seconde moitié = numéro de série
+Une adresse MAC (Media Access Control) est un identifiant unique attribué à chaque carte réseau. Elle permet d’identifier un appareil de manière unique sur un réseau local (LAN).
+C’est une chaîne de 48 bits (6 octets) généralement représentée sous forme hexadécimale :
+```
+AA:BB:CC:DD:EE:FF
+```
+- **Unique au monde (théoriquement)**: chaque carte réseau devrait avoir une adresse MAC unique.
+- **Structure**:
+  - **Première moitié (OUI – Organizationally Unique Identifier)** : identifie le constructeur de la carte réseau.
+  - **Seconde moitié (NIC – Network Interface Controller)** : correspond à un numéro de série unique attribué par le fabricant.
 
 **Exemples de protocoles :**
 - Ethernet (IEEE 802.3)
@@ -1132,6 +1136,22 @@ Pour chaque application, indiquez si TCP ou UDP est plus approprié :
 
 Un utilisateur ne peut pas accéder à Internet. Dans quel ordre testeriez-vous les couches OSI ?
 
+### Exercice 9 : Adresse MAC
+
+1. Trouver l’adresse (ou les) MAC de votre PC  selon votre système d’exploitation
+>> Tips: Windows (ipconfig /all) Linux/macOS (ifconfig) ou (ip link show)
+
+2. Séparez les trois premiers octets (OUI) et les trois derniers (NIC).
+3. Recherchez le fabricant associé à votre OUI sur ce site : https://macvendors.com
+
+### Exercice 10 : Compléments 
+
+1. À quel niveau du modèle OSI agit l’adresse MAC ?
+2. Que se passe-t-il si deux machines ont la même adresse MAC ?
+3. Peut-on modifier une adresse MAC ? Si oui, pourquoi le ferait-on ?
+4. Quelle est la différence entre adresse MAC et adresse IP ?
+
+
 ---
 
 ## 📚 Ressources complémentaires {#ressources}
@@ -1262,6 +1282,46 @@ En-tête SMTP (C7) → TCP (C4) → IP (C3) → Ethernet (C2)
 3. **Couche 3** : Adresse IP configurée ? Ping de la passerelle ?
 4. **Couche 4** : Ports ouverts ? Firewall ?
 5. **Couche 7** : DNS fonctionne ? Navigateur correct ?
+
+### Exercice 9 : Adresse MAC
+
+1. Trouver l’adresse MAC
+Exemples de sortie :
+
+Windows :
+```
+Carte réseau sans fil Wi-Fi :
+   Adresse physique. . . . . . . . . : 78-1A-04-5F-9D-3B
+```
+
+Linux :
+```
+eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        ether 08:00:27:6B:2A:9F  txqueuelen 1000  (Ethernet)
+```
+
+Adresse MAC trouvée : 78-1A-04-5F-9D-3B (exemple)
+
+2. Analyse de la structure
+
+| Partie                                       | Octets   | Signification                             | Exemple    |
+| -------------------------------------------- | -------- | ----------------------------------------- | ---------- |
+| **OUI (Organizationally Unique Identifier)** | 3 octets | Identifie le constructeur                 | `78-1A-04` |
+| **NIC (Network Interface Controller)**       | 3 octets | Identifie la carte unique du constructeur | `5F-9D-3B` |
+
+3. Fabricant
+Vérification sur macvendors.com :
+OUI 78:1A:04 → Dell Inc.
+Conclusion : Cette carte réseau a été fabriquée par Dell.
+
+### Exercice 10 : Compléments 
+
+| Question                                                            | Réponse attendue                                                                                                                                                                                     |
+| ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **1. À quel niveau du modèle OSI agit l’adresse MAC ?**             | Couche **Liaison de données (couche 2)**                                                                                                                                                             |
+| **2. Que se passe-t-il si deux machines ont la même adresse MAC ?** | Conflit d’adressage : les trames risquent d’être perdues ou mal dirigées. Le switch ne sait plus sur quel port envoyer.                                                                              |
+| **3. Peut-on modifier une adresse MAC ? Si oui, pourquoi ?**        | Oui, via une commande système (ex. `macchanger` sous Linux). Souvent fait pour :<br>• contourner un filtrage MAC<br>• préserver la vie privée<br>• tester la sécurité d’un réseau                    |
+| **4. Quelle est la différence entre adresse MAC et adresse IP ?**   | • MAC = identifiant **physique**, local, fixe (couche 2)<br>• IP = identifiant **logique**, routable, modifiable (couche 3)<br>Les deux sont nécessaires pour transmettre des données sur un réseau. |
 
 ------
 
