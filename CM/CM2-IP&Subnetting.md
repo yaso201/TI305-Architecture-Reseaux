@@ -298,9 +298,9 @@ Historiquement, les adresses IPv4 étaient divisées en **classes** (A, B, C, D,
 
 | Classe | Premier(s) bit(s) | Plage | Masque défaut | Réseaux | Hôtes/réseau | Usage |
 |--------|-------------------|-------|---------------|---------|--------------|-------|
-| **A** | 0 | 1-126 | /8 | 126 | 16M | Très grands |
-| **B** | 10 | 128-191 | /16 | 16K | 65K | Moyens |
-| **C** | 110 | 192-223 | /24 | 2M | 254 | Petits |
+| **A** | 0 | 1-126 | 255.0.0.0 | 126 | 16M | Très grands |
+| **B** | 10 | 128-191 | 255.255.0.0 | 16K | 65K | Moyens |
+| **C** | 110 | 192-223 | 255.255.255.0 | 2M | 254 | Petits |
 | **D** | 1110 | 224-239 | - | - | - | Multicast |
 | **E** | 1111 | 240-255 | - | - | - | Réservé |
 
@@ -708,60 +708,39 @@ Après subnetting (/26) :
 
 **Contexte :**
 - Réseau de départ : `192.168.1.0/24`
-- Besoin : 4 sous-réseaux
-- Hôtes par sous-réseau : environ 50
+- Besoin : 6 sous-réseaux
 
 **Étape 1 : Bits à emprunter**
 ```
-Pour 4 sous-réseaux : 2^2 = 4 ✓
-Emprunter 2 bits
+Pour 6 sous-réseaux : chercher n tel que 2^n ≥ 6
+2^3=8  8 ≥ 6 donc n=3
+Emprunter 3 bits
 ```
 
 **Étape 2 : Nouveau masque**
 ```
 Original : /24 (255.255.255.0)
-+ 2 bits : /26 (255.255.255.192)
++ 3 bits : /27 (255.255.255.224)
 ```
 
-**Étape 3 : Calcul des paramètres**
+**Étape 3 : Les 6 (8 en réalité) sous-réseaux**
 ```
-Bits hôte restants : 8 - 2 = 6
-Hôtes par sous-réseau : 2^6 - 2 = 62 ✓
-Incrément : 2^6 = 64
-```
+                                                Zone de bits d'emprunt
+                                               /
+Ancien masque  : 11111111.11111111.11111111.||000||00000
+Nouveau masque : 11111111.11111111.11111111.||111||00000
+Ancien Réseau  : 11000000.10101000.00000001.||000||00000
+----------------------------------------------------------   IP Réseau            Plage utilisable 
+Sous-Réseau 1  : 11000000.10101000.00000001.||000||00000 => 192.168.1.0/27    (192.168.1.1 - 192.168.1.30)
+Sous-Réseau 2  : 11000000.10101000.00000001.||001||00000 => 192.168.1.32/27   (192.168.1.33 - 192.168.1.62)
+Sous-Réseau 3  : 11000000.10101000.00000001.||010||00000 => 192.168.1.64/27   (192.168.1.65 - 192.168.1.94)
+Sous-Réseau 4  : 11000000.10101000.00000001.||011||00000 => 192.168.1.96/27   (192.168.1.97 - 192.168.1.126)
+Sous-Réseau 5  : 11000000.10101000.00000001.||100||00000 => 192.168.1.128/27  (192.168.1.129 - 192.168.1.158)
+Sous-Réseau 6  : 11000000.10101000.00000001.||101||00000 => 192.168.1.160/27  (192.168.1.161 - 192.168.1.190)
+========================================================== 2 sous réseaux en bonus pour de futurs usages
+Sous-Réseau 8  : 11000000.10101000.00000001.||110||00000 => 192.168.1.192/27  (192.168.1.193 - 192.168.1.222)
+Sous-Réseau 8  : 11000000.10101000.00000001.||111||00000 => 192.168.1.224/27  (192.168.1.225 - 192.168.1.254)
 
-**Étape 4 : Les 4 sous-réseaux**
-
-**Sous-réseau 1 :**
-```
-Réseau     : 192.168.1.0/26
-Première IP: 192.168.1.1
-Dernière IP: 192.168.1.62
-Broadcast  : 192.168.1.63
-```
-
-**Sous-réseau 2 :**
-```
-Réseau     : 192.168.1.64/26
-Première IP: 192.168.1.65
-Dernière IP: 192.168.1.126
-Broadcast  : 192.168.1.127
-```
-
-**Sous-réseau 3 :**
-```
-Réseau     : 192.168.1.128/26
-Première IP: 192.168.1.129
-Dernière IP: 192.168.1.190
-Broadcast  : 192.168.1.191
-```
-
-**Sous-réseau 4 :**
-```
-Réseau     : 192.168.1.192/26
-Première IP: 192.168.1.193
-Dernière IP: 192.168.1.254
-Broadcast  : 192.168.1.255
 ```
 
 ### Exemple 2 : Plus de sous-réseaux
