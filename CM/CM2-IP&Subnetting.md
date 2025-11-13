@@ -174,14 +174,14 @@ Une adresse IP se compose de **deux parties** :
 
 **Exemple :**
 ```
-Adresse : 192.168.1.10
-Masque  : 255.255.255.0
+Adresse : 192.168.1.10   =binaire==> [11000000.10101000.00000001] . [00001010]
+Masque  : 255.255.255.0  =binaire==> [11111111.11111111.11111111] . [00000000]
+                                       Partie réseau : 192.168.1  . Partie hôte : 10
+                                        (premiers 24 bits)          (derniers 8 bits)
 
-Partie réseau : 192.168.1     (premiers 24 bits)
-Partie hôte   : 10            (derniers 8 bits)
 ```
 
-Le **masque de sous-réseau** détermine où se situe la séparation.
+Le **masque de sous-réseau** détermine où se situe la séparation (discuté en détail dans la suite).
 
 ---
 
@@ -400,7 +400,7 @@ ping 127.0.0.1    # Teste la pile TCP/IP locale
 
 **Définition :** Adresses **uniques mondialement**, routables sur Internet.
 
-**Attribution :** Gérées par les RIR (Regional Internet Registries) et ISP.
+**Attribution :** Gérées par les RIR (Regional Internet Registries) et les ISP (ou FAI:Fournisseurs d'Accès à Internet; ex: Free, Bouygues et Orange).
 
 **Caractéristiques :**
 - ✅ Accessibles depuis Internet
@@ -454,20 +454,49 @@ ping 127.0.0.1    # Teste la pile TCP/IP locale
 
 **Problème :** Les adresses privées ne sont pas routables sur Internet.
 
-**Solution :** NAT traduit les adresses privées en adresses publiques.
+**Solution :** Le NAT (Network Address Translation) est une technique qui permet de traduire les adresses IP privées en adresses IP publiques lorsqu'un appareil sur un réseau local doitcommuniquer avec l'extérieur.
 
 **Fonctionnement :**
+
 ```
-Réseau interne (privé)         Internet (public)
-192.168.1.10 ──────► [Routeur NAT] ──────► 203.0.113.5
-192.168.1.11 ──────►  (Traduction) ──────► 203.0.113.5
-192.168.1.12 ──────►                ──────► 203.0.113.5
+╔══════════════════════════════════════╗
+║         Réseau Interne (Privé)       ║
+║--------------------------------------║
+║ 192.168.1.10:1025  ─┐                ║
+║ 192.168.1.11:1033  ─┼──►             ║
+║ 192.168.1.12:1041  ─┘                ║
+╚──────────────┬───────────────────────╝
+               │
+               │  Traduction d’adresses + ports
+               ▼
+        ╔══════════════════════════════════════╗
+        ║           Routeur NAT                ║
+        ║--------------------------------------║
+        ║ Table NAT :                          ║
+        ║ 192.168.1.10:1025 → 203.0.113.5:4001 ║
+        ║ 192.168.1.11:1033 → 203.0.113.5:4002 ║
+        ║ 192.168.1.12:1041 → 203.0.113.5:4003 ║
+        ╚══════════════════════════════════════╝
+               │
+               ▼
+╔══════════════════════════════════════╗
+║            Internet (Public)         ║
+║--------------------------------------║
+║ Toutes les connexions sortent avec   ║
+║ l’adresse publique : 203.0.113.5     ║
+╚══════════════════════════════════════╝
 ```
 
 **Types de NAT :**
-- **SNAT (Source NAT)** : Change l'IP source (sortie Internet)
-- **DNAT (Destination NAT)** : Change l'IP destination (redirection de ports)
+- **NAT statique (Static NAT)** : Correspondance 1:1 fixe entre une adresse privée et une adresse publique (Nécessite une adresse publique par machine; Peu scalable).
+- **NAT dynamique (Dynamic NAT)** : Correspondance 1:1 non fixe : le routeur choisit une adresse publique dans un pool disponible (Toujours besoin d’autant d’IP publiques que de connexions; L’adresse publique change → pas adapté aux serveurs internes).
+- **SNAT (Source NAT)** : Change l'IP source (sortie Internet). Utilisé principalement pour les connexions sortantes du réseau privé vers Internet.
+- **DNAT (Destination NAT)** : Change l'IP destination (redirection de ports). Utilisé pour rediriger un trafic entrant vers un serveur interne.
 - **PAT (Port Address Translation)** : NAT + ports (le plus courant)
+  - Le PAT permet à plusieurs machines internes d’utiliser une seule adresse IP publique,
+en distinguant chaque connexion grâce aux numéros de port.
+  - C’est le type de NAT le plus courant dans les réseaux domestiques et dans la majorité des entreprises.
+  - Autre nom : **NAT surcharge (NAT Overload)** ou **Masquerading sous Linux.**
 
 **Avantages :**
 - Économise les adresses IP publiques
@@ -512,8 +541,6 @@ Le **masque de sous-réseau (subnet mask)** détermine :
 - Quelle partie de l'adresse IP est le **réseau**
 - Quelle partie est l'**hôte**
 
-**Analogie :** Comme un pochoir qui sépare réseau et hôte.
-
 ### Format du masque
 
 **Représentation décimale :**
@@ -530,16 +557,20 @@ Le **masque de sous-réseau (subnet mask)** détermine :
 - **1** = partie réseau
 - **0** = partie hôte
 
-### Opération AND logique
+### Identification du réseau d'un hôte (Opération AND logique)
 
-**Pour déterminer le réseau :** Appliquer un **ET logique (AND)** entre l'IP et le masque.
+**Pour déterminer le réseau auquel appartient un hôte particulier :** Appliquer un **ET logique (AND)** entre l'IP et le masque.
 
 **Exemple :**
 ```
-Adresse IP  : 192.168.1.10    = 1 1 0 0 0 0 0 0 . 1 0 1 0 1 0 0 0 . 0 0 0 0 0 0 0 1 . 0 0 0 0 1 0 1 0
-                AND logique
-Masque      : 255.255.255.0   = 1 1 1 1 1 1 1 1 . 1 1 1 1 1 1 1 1 . 1 1 1 1 1 1 1 1 . 0 0 0 0 0 0 0 0
-Réseau      : 192.168.1.0     = 1 1 0 0 0 0 0 0 . 1 0 1 0 1 0 0 0 . 0 0 0 0 0 0 0 1 . 0 0 0 0 0 0 0 0
+Soit l'adresse suivante d'un hôte: 192.168.1.10/255.255.255.0
+Déterminez le réseau auque appartient cet hôte.
+
+        192.168.  1.10  = 11000000 . 10101000 . 00000001 . 00001010
+AND     255.255.255. 0  = 11111111 . 11111111 . 11111111 . 00000000
+=      -------------------------------------------------------------
+        192.168.  1. 0  = 11000000 . 10101000 . 00000001 . 00000000
+
 ```
 
 **Règle AND :**
@@ -548,9 +579,13 @@ Réseau      : 192.168.1.0     = 1 1 0 0 0 0 0 0 . 1 0 1 0 1 0 0 0 . 0 0 0 0 0 0
 - 0 AND 1 = 0
 - 0 AND 0 = 0
 
-### Masques courants
+### Notation CIDR
 
-| Masque décimal | Masque binaire | CIDR | Bits réseau | Bits hôte | Hôtes |
+- **Rappel: Contiguïté des bits dans un masque** Un masque de sous-réseau en binaire est constitué d'une suite contigüe de **1** (bits de poids fort pour le réseau), suivis d'une suite de **0** (bits de poids faible pour les hôtes).
+- **Notation CIDR :** Cette continuité des bits dans le masque est exploitée par la notation CIDR, qui permet de préciser directement combien de bits sont réservés pour la partie réseau d’une adresse IP.
+- **Exemple :** 10.80.96.11/255.255.252.0 => 10.80.96.11/11111111.11111111.11111100.00000000 indique que les 22 premiers bits représentent la partie réseau, tandis que le reste (10) sert à l’adressage des hôtes. Sa **notation CIDR** sera alors **10.80.96.11/22**
+
+| Masque décimal | CIDR | Masque binaire | Bits réseau | Bits hôte | Hôtes |
 |----------------|----------------|------|-------------|-----------|-------|
 | 255.0.0.0 | /8 | 11111111.00000000... | 8 | 24 | 16 777 214 |
 | 255.255.0.0 | /16 | 11111111.11111111.00000000... | 16 | 16 | 65 534 |
@@ -585,32 +620,33 @@ Où **n** = nombre de bits hôte
 **Configuration :**
 ```
 Adresse IP : 172.16.50.100
-Masque     : 255.255.255.0 (/24)
+Masque     : 255.255.240.0 (/20)
 ```
 
 **Calculs :**
 
 **Adresse réseau :**
 ```
-172.16.50.100 AND 255.255.255.0 = 172.16.50.0
+|    |172 .  16 .  50 . 100 | 10101100 . 00010000 . 0011||0010 . 01100100|
+|AND |255 . 255 . 255 .   0 | 11111111 . 11111111 . 1111||0000 . 00000000|
+|--- |----------------------|---------------------------||---------------|
+| =  |172 .  16 .  48 .   0 | 10101100 . 00010000 . 0011||0000 . 00000000|
+
 ```
 
 **Adresse broadcast :**
 ```
 Dernier octet : tous les bits hôte à 1
-= 172.16.50.255
+10101100 . 00010000 . 0011||1111 .11111111 = 172.16.63.255
+
 ```
 
 **Plage d'hôtes utilisables :**
 ```
-Première IP : 172.16.50.1
-Dernière IP : 172.16.50.254
-Nombre      : 254 hôtes
-```
+Première IP    : 10101100 . 00010000 . 0011||0000 . 00000001 = 172.16.48.1
+Dernière IP    : 10101100 . 00010000 . 0011||1111 . 11111110 = 172.16.63.254
+Nombre d'hôtes : 2^12 - 2 soit 4094 hôtes
 
-**Passerelle par défaut (conventionnelle) :**
-```
-Souvent : 172.16.50.1 ou 172.16.50.254
 ```
 
 ---
@@ -644,7 +680,7 @@ Avant subnetting (Classe C) :
 
 Après subnetting (/26) :
 [  Réseau (24 bits)  ][SR(2)][Hôte(6)]
-192.168.1             .00    .000000   → 4 sous-réseaux, 62 hôtes chacun
+[    192.168.1.      ][  00 ][000000 ]  → 4 sous-réseaux, 62 hôtes chacun
 ```
 
 ### Méthodologie de calcul
