@@ -198,9 +198,10 @@ La **topologie** désigne l'architecture physique ou logique d'organisation des 
 Tous les équipements sont connectés à un câble unique (le bus).
 
 ```
-[PC1]---[PC2]---[PC3]---[PC4]---[PC5]
-         |                        |
-      Terminaison             Terminaison
+====|=======|=======|=======|=======|========= Bus
+    |       |       |       |       |
+  [PC1]   [PC2]   [PC3]   [PC4]   [PC5]
+
 ```
 
 **Avantages :**
@@ -264,6 +265,29 @@ Les équipements sont connectés en boucle fermée, les données circulent dans 
 - ❌ Plus complexe à gérer
 
 **Usage :** Token Ring (IBM), FDDI. Rare aujourd'hui.
+
+### Topologie linéaire
+
+**Description :**
+Les équipements sont connectés les uns à la suite des autres, formant une ligne droite.
+Les données circulent d’un poste à l’autre jusqu’à atteindre leur destination.
+
+```
+ [PC1]---[PC2]---[PC3]---[PC4]
+```
+
+**Avantages :**
+- ✅ Installation simple et économique
+- ✅ Facile à comprendre et à mettre en œuvre
+- ✅ Moins de câblage qu’une étoile
+
+**Inconvénients :**
+- ❌ Rupture d’un câble = réseau partiellement ou totalement coupé
+- ❌ Performances limitées avec beaucoup de stations
+- ❌ Difficile à dépanner et à étendre
+
+**Usage :** Utilisée dans les premiers réseaux Ethernet coaxiaux (10Base2, 10Base5).
+Aujourd’hui, remplacée par la topologie en étoile.
 
 ### Topologie maillée
 
@@ -341,8 +365,9 @@ Câbles contenant plusieurs paires de fils de cuivre torsadés ensemble pour ré
 
 **Types principaux :**
 - **UTP (Unshielded Twisted Pair)** : non blindé, le plus courant
-- **STP (Shielded Twisted Pair)** : blindé, meilleure protection
-- **FTP (Foiled Twisted Pair)** : écran global
+- **STP (Shielded Twisted Pair)** : Chaque paire de fils est blindée individuellement, Bonne protection
+- **FTP (Foiled Twisted Pair)** : Une feuille métallique entoure toutes les paires torsadées, Bonne protection contre les interférences, flexible
+- **S/FTP (Shielded Fioled Twisted Pais)**: Blindage individuel des paires et un blindage global, Protection maximale contre les interférences, Coûteux et peu flexible
 
 **Catégories Ethernet :**
 
@@ -356,6 +381,54 @@ Câbles contenant plusieurs paires de fils de cuivre torsadés ensemble pour ré
 | **Cat 8**     | 2000 MHz       | 40 Gbps     | Datacenter      |
 
 **Connecteurs :** RJ45 (8P8C)
+
+**Sertissage :** l’art de relier le connecteur au bout du câble
+
+**Disposition des fils pour le sertissage:**
+
+```
+ 1 : blanc-orange
+ 2 : orange
+ 3 : blanc-vert
+ 4 : bleu
+ 5 : blanc-bleu
+ 6 : vert
+ 7 : blanc-marron
+ 8 : marron
+```
+
+**Transmission :** 1 et 2
+**Réception :** 3 et 6
+
+**Les Types de câbles sertis:**
+- **Les câbles droits :** ordre des fils est identique dans chaque connecteur RJ45
+```
+   _                _
+ 1  |              |  1
+ 2  |              |  2
+ 3  |              |  3
+ 4  |==============|  4
+ 5  |              |  5
+ 6  |              |  6
+ 7  |              |  7
+ 8 _|              |_ 8
+
+```
+
+- **Les câbles crooisés :** l'ordre des fils n'est pas identique dans chaque connecteur RJ45
+```
+   _                _
+ 1  |              |  3
+ 2  |              |  6
+ 3  |              |  1
+ 4  |==============|  4
+ 5  |              |  5
+ 6  |              |  2
+ 7  |              |  7
+ 8 _|              |_ 8
+
+```
+Aujourd’hui on n’utilise plus que des câbles droits car les cartes réseaux savent différencier facilement la Transmission de la Réception.
 
 **Avantages :**
 - ✅ Coût faible
