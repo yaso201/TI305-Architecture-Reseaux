@@ -402,6 +402,7 @@ Câbles contenant plusieurs paires de fils de cuivre torsadés ensemble pour ré
 
 **Les Types de câbles sertis:**
 - **Les câbles droits :** ordre des fils est identique dans chaque connecteur RJ45
+  
 ```
    _                _
  1  |              |  1
